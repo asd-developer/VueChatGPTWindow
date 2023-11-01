@@ -5,13 +5,15 @@
                  alt="logo">
             <button onclick="minimizeChat()"><img src="minimize-window.svg"></button>
         </header>
-        <main>
-          <ul v-if="allMessages.length">
-            <li v-for="(message, index) in allMessages" :key="index" :class="message.sender">
-                {{ message.text }}
-            </li>
-          </ul>
-        </main>
+        <div class="chat-window">
+            <ul v-if="allMessages.length">
+                <li v-for="(message, index) in allMessages"
+                    :key="index"
+                    :class="message.sender">
+                    {{ message.text }}
+                </li>
+            </ul>
+        </div>
         <footer>
             <textarea spellcheck="false"></textarea>
             <button onclick="sendMessage()"><img src="send.svg"></button>
@@ -19,9 +21,33 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const allMessages = ref([] as Message[]);
+const allMessages = ref([
+  { sender: "gpt", text: "Hello please write your question bellow." },
+  { sender: "user", text: "Hello this is a test." },
+] as Message[]);
+const GPTApiKey = import.meta.env.VITE_GPT_API;
+
+const sendToChatGPT = async (userMessage: string) => {
+  const apiKey = GPTApiKey; // Replace with your actual API key
+  const apiUrl = "https://api.openai.com/v1/engines/davinci-codex/completions"; // Adjust the engine as needed
+
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      prompt: userMessage,
+      max_tokens: 50, // Adjust as needed
+    }),
+  });
+
+  const responseData = await response.json();
+  return responseData.choices[0].text;
+};
 
 interface Message {
   sender: string;
@@ -66,6 +92,20 @@ interface Message {
         width: 15px;
         height: 5px;
       }
+    }
+  }
+
+  .chat-window {
+    li {
+      color: black;
+    }
+
+    .gpt {
+      background-color: #75ac9d;
+    }
+
+    .user {
+      background-color: white;
     }
   }
 
