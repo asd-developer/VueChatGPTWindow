@@ -25,12 +25,15 @@ import { ref } from "vue";
 
 const allMessages = ref([
   { sender: "gpt", text: "Hello please write your question bellow." },
-  { sender: "user", text: "Hello this is a test." },
+  { sender: "user", text: "Hello this is a test." },{ sender: "gpt", text: "Hello please write your question bellow." },
+  { sender: "user", text: "Hello this is a test." },{ sender: "gpt", text: "Hello please write your question bellow." },
+  { sender: "user", text: "Hello this is a test." },{ sender: "gpt", text: "Hello please write your question bellow." },
+  { sender: "user", text: "Hello this is a test." },{ sender: "gpt", text: "Hello please write your question bellow." }
 ] as Message[]);
 const GPTApiKey = import.meta.env.VITE_GPT_API;
 
 const sendToChatGPT = async (userMessage: string) => {
-  const apiKey = GPTApiKey; // Replace with your actual API key
+  const apiKey = GPTApiKey;
   const apiUrl = "https://api.openai.com/v1/engines/davinci-codex/completions"; // Adjust the engine as needed
 
   const response = await fetch(apiUrl, {
@@ -41,7 +44,7 @@ const sendToChatGPT = async (userMessage: string) => {
     },
     body: JSON.stringify({
       prompt: userMessage,
-      max_tokens: 50, // Adjust as needed
+      max_tokens: 50,
     }),
   });
 
@@ -79,6 +82,8 @@ interface Message {
     justify-content: center;
     align-items: center;
     background-color: #75ac9d;
+    box-shadow: 2px 2px 10px 0 rgba(0, 0, 0, 0.5);
+    z-index: 10;
     img {
       max-width: 100%;
       width: 35px;
@@ -96,16 +101,33 @@ interface Message {
   }
 
   .chat-window {
+    display: flex;
+    justify-content: center;
+    margin-top: 5px;
+    overflow: auto;
+    ul {
+      list-style-type: disc; 
+      margin: 0;
+      padding: 0;
+      width: 95%;
+    }
+
     li {
       color: black;
+      list-style-type: none;
+      padding: 10px;
+      padding-left: 20px;
+      margin: 10px 0;
     }
 
     .gpt {
       background-color: #75ac9d;
+      border-radius: 25px 25px 0px 25px;
     }
 
     .user {
       background-color: white;
+      border-radius: 25px 25px 25px 0px;
     }
   }
 
