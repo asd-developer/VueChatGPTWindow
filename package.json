@@ -10,6 +10,7 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
   },
   "dependencies": {
+    "dotenv": "^16.3.1",
     "sass": "^1.69.5",
     "vue": "^3.3.4"
   },

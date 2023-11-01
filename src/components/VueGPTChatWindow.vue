@@ -6,7 +6,11 @@
             <button onclick="minimizeChat()"><img src="minimize-window.svg"></button>
         </header>
         <main>
-
+          <ul v-if="allMessages.length">
+            <li v-for="(message, index) in allMessages" :key="index" :class="message.sender">
+                {{ message.text }}
+            </li>
+          </ul>
         </main>
         <footer>
             <textarea spellcheck="false"></textarea>
@@ -15,6 +19,14 @@
     </div>
 </template>
 <script setup lang="ts">
+import { ref } from 'vue'
+
+const allMessages = ref([] as Message[]);
+
+interface Message {
+  sender: string;
+  text: string;
+}
 </script>
 <style lang="scss">
 .chat-container {
@@ -83,10 +95,9 @@
         border: none;
         outline: none;
       }
-
     }
-    button{
-        margin-left: 15px;
+    button {
+      margin-left: 15px;
     }
   }
 }
