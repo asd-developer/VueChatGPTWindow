@@ -15,42 +15,55 @@
             </ul>
         </div>
         <footer>
-            <textarea spellcheck="false"></textarea>
-            <button onclick="sendMessage()"><img src="send.svg"></button>
+            <textarea spellcheck="false"
+                      v-model="currentMessage"
+                      placeholder=""></textarea>
+            <button @click="sendToChatGPT(currentMessage)"><img src="send.svg"></button>
         </footer>
     </div>
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
+import axios from "axios";
 
 const allMessages = ref([
   { sender: "gpt", text: "Hello please write your question bellow." },
-  { sender: "user", text: "Hello this is a test." },{ sender: "gpt", text: "Hello please write your question bellow." },
-  { sender: "user", text: "Hello this is a test." },{ sender: "gpt", text: "Hello please write your question bellow." },
-  { sender: "user", text: "Hello this is a test." },{ sender: "gpt", text: "Hello please write your question bellow." },
-  { sender: "user", text: "Hello this is a test." },{ sender: "gpt", text: "Hello please write your question bellow." }
 ] as Message[]);
+
+const currentMessage = ref("");
+
 const GPTApiKey = import.meta.env.VITE_GPT_API;
 
-const sendToChatGPT = async (userMessage: string) => {
+async function sendToChatGPT(userMessage: string) {
+  allMessages.value.push({ sender: "user", text: currentMessage.value });
+  currentMessage.value = "";
+
   const apiKey = GPTApiKey;
-  const apiUrl = "https://api.openai.com/v1/engines/davinci-codex/completions"; // Adjust the engine as needed
+  const apiUrl = "https://api.openai.com/v1/chat/completions"; // Adjust the engine as needed
 
-  const response = await fetch(apiUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      prompt: userMessage,
-      max_tokens: 50,
-    }),
-  });
+  const postData = {
+    model: "gpt-3.5-turbo",
+    messages: [{ role: "user", content: userMessage }],
+  };
 
-  const responseData = await response.json();
-  return responseData.choices[0].text;
-};
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${apiKey}`,
+  };
+
+  try {
+    const response = await axios.post(apiUrl, postData, { headers });
+
+    const responseData = await response.data;
+    allMessages.value.push({
+      sender: "gpt",
+      text: responseData.choices[0].message.content,
+    });
+    return;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
 
 interface Message {
   sender: string;
@@ -106,7 +119,7 @@ interface Message {
     margin-top: 5px;
     overflow: auto;
     ul {
-      list-style-type: disc; 
+      list-style-type: disc;
       margin: 0;
       padding: 0;
       width: 95%;
