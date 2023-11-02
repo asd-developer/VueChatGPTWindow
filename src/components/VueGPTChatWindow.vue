@@ -1,25 +1,30 @@
 <template>
     <div class="chat-container">
-        <header>
+        <header class="chat-header" @click="maximizeChat()">
             <img src="gpt_logo.png"
                  alt="logo">
-            <button onclick="minimizeChat()"><img src="minimize-window.svg"></button>
+            <button @click="minimizeChat($event)"><img src="minimize-window.svg"></button>
         </header>
-        <div class="chat-window">
-            <ul v-if="allMessages.length">
-                <li v-for="(message, index) in allMessages"
-                    :key="index"
-                    :class="message.sender">
-                    {{ message.text }}
-                </li>
-            </ul>
-        </div>
-        <footer>
-            <textarea spellcheck="false"
-                      v-model="currentMessage"
-                      placeholder=""></textarea>
-            <button @click="sendToChatGPT(currentMessage)"><img src="send.svg"></button>
-        </footer>
+        <transition>
+            <div class="chat-body"
+                 v-if="isChatActive">
+                <div class="chat-window">
+                    <ul v-if="allMessages.length">
+                        <li v-for="(message, index) in allMessages"
+                            :key="index"
+                            :class="message.sender">
+                            {{ message.text }}
+                        </li>
+                    </ul>
+                </div>
+                <footer>
+                    <textarea spellcheck="false"
+                              v-model="currentMessage"
+                              placeholder=""></textarea>
+                    <button @click="sendToChatGPT(currentMessage)"><img src="send.svg"></button>
+                </footer>
+            </div>
+        </transition>
     </div>
 </template>
 <script setup lang="ts">
@@ -29,6 +34,8 @@ import axios from "axios";
 const allMessages = ref([
   { sender: "gpt", text: "Hello please write your question bellow." },
 ] as Message[]);
+
+const isChatActive = ref(false);
 
 const currentMessage = ref("");
 
@@ -65,6 +72,15 @@ async function sendToChatGPT(userMessage: string) {
   }
 }
 
+function minimizeChat(event) {
+  event.stopPropagation(); 
+  isChatActive.value = false;
+}
+
+function maximizeChat() {
+  isChatActive.value = true;
+}
+
 interface Message {
   sender: string;
   text: string;
@@ -72,9 +88,15 @@ interface Message {
 </script>
 <style lang="scss">
 .chat-container {
+  position: absolute;
+  bottom: 0px;
+  right: 30px;
+}
+
+.chat-body {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 30px 1fr 65px;
+  grid-template-rows: 1fr 65px;
   justify-content: center;
   height: 600px;
   width: 400px;
@@ -86,31 +108,6 @@ interface Message {
     align-items: center;
     background-color: transparent;
     border: none;
-  }
-
-  header {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    height: 35px;
-    justify-content: center;
-    align-items: center;
-    background-color: #75ac9d;
-    box-shadow: 2px 2px 10px 0 rgba(0, 0, 0, 0.5);
-    z-index: 10;
-    img {
-      max-width: 100%;
-      width: 35px;
-      height: 35px;
-      margin-left: 5px;
-    }
-    button {
-      color: white;
-      margin-right: 5px;
-      img {
-        width: 15px;
-        height: 5px;
-      }
-    }
   }
 
   .chat-window {
@@ -173,6 +170,38 @@ interface Message {
     }
     button {
       margin-left: 15px;
+    }
+  }
+}
+
+.chat-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  height: 35px;
+  width: 400px;
+  justify-content: center;
+  align-items: center;
+  background-color: #75ac9d;
+  box-shadow: 2px 2px 10px 0 rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  img {
+    max-width: 100%;
+    width: 35px;
+    height: 35px;
+    margin-left: 5px;
+  }
+  button {
+    color: white;
+    margin-right: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+
+    img {
+      width: 15px;
+      height: 5px;
     }
   }
 }
