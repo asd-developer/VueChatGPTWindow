@@ -1,13 +1,23 @@
 <template>
     <div class="chat-container">
-        <header class="chat-header" @click="maximizeChat()">
+        <header class="chat-header"
+                v-if="!isChatActive"
+                @click="maximizeChat()">
             <img src="gpt_logo.png"
                  alt="logo">
-            <button @click="minimizeChat($event)"><img src="minimize-window.svg"></button>
+            <div>
+                <button><img src="minimize-window.svg"></button>
+            </div>
         </header>
-        <transition>
-            <div class="chat-body"
-                 v-if="isChatActive">
+        <div v-if="isChatActive">
+            <header class="chat-header">
+                <img src="gpt_logo.png"
+                     alt="logo">
+                <div>
+                    <button @click="minimizeChat()"><img src="minimize-window.svg"></button>
+                </div>
+            </header>
+            <div class="chat-body">
                 <div class="chat-window">
                     <ul v-if="allMessages.length">
                         <li v-for="(message, index) in allMessages"
@@ -24,7 +34,7 @@
                     <button @click="sendToChatGPT(currentMessage)"><img src="send.svg"></button>
                 </footer>
             </div>
-        </transition>
+        </div>
     </div>
 </template>
 <script setup lang="ts">
@@ -72,8 +82,7 @@ async function sendToChatGPT(userMessage: string) {
   }
 }
 
-function minimizeChat(event) {
-  event.stopPropagation(); 
+function minimizeChat() {
   isChatActive.value = false;
 }
 
@@ -184,25 +193,42 @@ interface Message {
   background-color: #75ac9d;
   box-shadow: 2px 2px 10px 0 rgba(0, 0, 0, 0.5);
   z-index: 10;
+
   img {
     max-width: 100%;
     width: 35px;
     height: 35px;
     margin-left: 5px;
   }
-  button {
-    color: white;
-    margin-right: 5px;
+
+  div {
+    widows: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: transparent;
-    border: none;
 
-    img {
-      width: 15px;
-      height: 5px;
+    button {
+      color: white;
+      margin-right: 5px;
+      background-color: transparent;
+      border: none;
+
+      img {
+        width: 15px;
+        height: 5px;
+      }
     }
   }
+}
+
+.chat-slide-enter-active,
+.chat-slide-leave-active {
+  transition: transform 0.3s ease-out;
+}
+
+.chat-slide-enter-from,
+.chat-slide-leave-to {
+  transform: translateY(100%);
 }
 </style>
