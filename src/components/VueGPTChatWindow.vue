@@ -30,7 +30,8 @@
                 <footer>
                     <textarea spellcheck="false"
                               v-model="currentMessage"
-                              placeholder=""></textarea>
+                              placeholder=""
+                              @keyup.enter="sendMessageOrLineBreak"></textarea>
                     <button @click="sendToChatGPT(currentMessage)"><img src="send.svg"></button>
                 </footer>
             </div>
@@ -88,6 +89,14 @@ function minimizeChat() {
 
 function maximizeChat() {
   isChatActive.value = true;
+}
+
+function sendMessageOrLineBreak(event: KeyboardEvent) {
+  if (event.ctrlKey) {
+    currentMessage.value += "\n";
+  } else {
+    sendToChatGPT(currentMessage.value);
+  }
 }
 
 interface Message {
