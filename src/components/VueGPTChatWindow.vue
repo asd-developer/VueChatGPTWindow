@@ -57,7 +57,7 @@ async function sendToChatGPT(userMessage: string) {
   currentMessage.value = "";
 
   const apiKey = GPTApiKey;
-  const apiUrl = "https://api.openai.com/v1/chat/completions"; // Adjust the engine as needed
+  const apiUrl = "https://api.openai.com/v1/chat/completions";
 
   const postData = {
     model: "gpt-3.5-turbo",
